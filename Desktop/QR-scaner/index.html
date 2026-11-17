@@ -286,6 +286,114 @@
       text-decoration: none;
     }
 
+    /* Step Wizard Styles */
+    .step-hidden { display: none !important; }
+
+    .progress-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .progress-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      border: 2px solid rgba(159, 176, 199, 0.3);
+      color: var(--muted);
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .progress-circle.active {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold);
+    }
+
+    .progress-circle.completed {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    .progress-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: none;
+    }
+
+    .progress-line {
+      width: 40px;
+      height: 2px;
+      background: rgba(159, 176, 199, 0.3);
+      transition: background 0.3s ease;
+    }
+
+    .progress-line.completed {
+      background: var(--success);
+    }
+
+    .btn-nav {
+      display: block;
+      width: 100%;
+      padding: 0.95rem 1.5rem;
+      background: linear-gradient(135deg, var(--gold) 0%, #b8962e 100%);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 1.05rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      font-family: inherit;
+      margin-top: 0.5rem;
+    }
+
+    .btn-nav:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+    }
+
+    .btn-nav:active {
+      transform: translateY(0);
+    }
+
+    .btn-back {
+      display: block;
+      width: 100%;
+      padding: 0.85rem 1.5rem;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid rgba(159, 176, 199, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      margin-top: 0.75rem;
+    }
+
+    .btn-back:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
     @media (max-width: 480px) {
       .card {
         padding: 1.25rem;
@@ -294,6 +402,11 @@
         width: 180px;
         height: 180px;
       }
+      .progress-line { width: 25px; }
+    }
+
+    @media (min-width: 481px) {
+      .progress-label { display: block; }
     }
   </style>
 </head>
@@ -317,8 +430,26 @@
       <input type="hidden" name="_template" value="table">
       <input type="hidden" name="_autoresponse" value="Thank you for registering for Stimulation and Career Counseling (22 November 2026, Youth Development Center). We have received your details and payment screenshot. Our team will verify your payment and confirm your seat. - GB Youth Global">
       <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+      <!-- Progress Bar -->
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-step">
+          <div class="progress-circle active" id="pc1">1</div>
+          <span class="progress-label">Details</span>
+        </div>
+        <div class="progress-line" id="pl1"></div>
+        <div class="progress-step">
+          <div class="progress-circle" id="pc2">2</div>
+          <span class="progress-label">Payment</span>
+        </div>
+        <div class="progress-line" id="pl2"></div>
+        <div class="progress-step">
+          <div class="progress-circle" id="pc3">3</div>
+          <span class="progress-label">Confirm</span>
+        </div>
+      </div>
+
       <!-- Step 1: Participant Details -->
-      <section class="card">
+      <section class="card" id="step1">
         <h2><span class="step">1</span> Participant Details</h2>
         <p class="desc">Enter your information to register for the event.</p>
 
@@ -341,10 +472,12 @@
           <label for="city">City (optional)</label>
           <input type="text" id="city" name="City" placeholder="Your city">
         </div>
+
+        <button type="button" class="btn-nav" id="nextBtn1" onclick="goToStep(2)">Next → Payment Details</button>
       </section>
 
       <!-- Step 2: EasyPaisa Payment -->
-      <section class="card">
+      <section class="card step-hidden" id="step2">
         <h2><span class="step">2</span> EasyPaisa Payment</h2>
         <p class="desc">Scan the QR code or send money to the number below. Keep your payment screenshot ready.</p>
 
@@ -359,10 +492,13 @@
             <strong>Note:</strong> Please pay the registration fee via EasyPaisa and take a screenshot of the payment. You will need it in the next step.
           </div>
         </div>
+
+        <button type="button" class="btn-nav" id="nextBtn2" onclick="goToStep(3)">Next → Upload Screenshot</button>
+        <button type="button" class="btn-back" onclick="goToStep(1)">← Back to Details</button>
       </section>
 
       <!-- Step 3: Payment Confirmation -->
-      <section class="card">
+      <section class="card step-hidden" id="step3">
         <h2><span class="step">3</span> Payment Confirmation</h2>
         <p class="desc">Upload a screenshot of the payment for verification.</p>
 
@@ -373,6 +509,7 @@
         </div>
 
         <button type="submit" class="btn" id="submitBtn">Submit Registration</button>
+        <button type="button" class="btn-back" onclick="goToStep(2)">← Back to Payment</button>
 
         <div class="success-msg" id="successMsg">
           <h3>✓ Payment Submitted Successfully</h3>
@@ -393,20 +530,71 @@
     const successMsg = document.getElementById('successMsg');
     const submitBtn = document.getElementById('submitBtn');
     const MAX_MB = 5;
+    let currentStep = 1;
+
+    function goToStep(step) {
+      // Validate before moving forward
+      if (step > currentStep) {
+        if (currentStep === 1) {
+          const fullName = document.getElementById('fullName').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const phone = document.getElementById('phone').value.trim();
+          if (!fullName || !email || !phone) {
+            alert('Please fill all required fields (Full Name, Email, Phone).');
+            return;
+          }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Please enter a valid email address.');
+            return;
+          }
+        }
+      }
+
+      // Hide all steps
+      document.getElementById('step1').classList.add('step-hidden');
+      document.getElementById('step2').classList.add('step-hidden');
+      document.getElementById('step3').classList.add('step-hidden');
+
+      // Show target step
+      document.getElementById('step' + step).classList.remove('step-hidden');
+
+      // Update progress bar
+      for (var i = 1; i <= 3; i++) {
+        var circle = document.getElementById('pc' + i);
+        circle.classList.remove('active', 'completed');
+        if (i < step) {
+          circle.classList.add('completed');
+          circle.textContent = '✓';
+        } else if (i === step) {
+          circle.classList.add('active');
+          circle.textContent = i;
+        } else {
+          circle.textContent = i;
+        }
+      }
+
+      // Update progress lines
+      document.getElementById('pl1').classList.toggle('completed', step > 1);
+      document.getElementById('pl2').classList.toggle('completed', step > 2);
+
+      currentStep = step;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     // Show success message after FormSubmit redirects back here
     if (location.search.indexOf('success=1') !== -1) {
+      goToStep(3);
       successMsg.classList.add('show');
       submitBtn.textContent = '✓ Submitted';
       submitBtn.disabled = true;
-      setTimeout(() => successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+      setTimeout(function() { successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
     }
 
     form.addEventListener('submit', function (e) {
-      const fullName = document.getElementById('fullName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const fileInput = document.getElementById('screenshot');
+      var fullName = document.getElementById('fullName').value.trim();
+      var email = document.getElementById('email').value.trim();
+      var phone = document.getElementById('phone').value.trim();
+      var fileInput = document.getElementById('screenshot');
 
       if (!fullName || !email || !phone || !fileInput.files.length) {
         e.preventDefault();
